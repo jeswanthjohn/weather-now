@@ -1,0 +1,90 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* BACKGROUND */
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #74ebd5, #9face6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* APP CONTAINER */
+.app {
+  width: 100%;
+  padding: 1rem;
+}
+
+/* GLASS CARD */
+.weather-card {
+  max-width: 360px;
+  margin: auto;
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  text-align: center;
+}
+
+/* TITLE */
+.app-title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* SEARCH */
+.search {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.search input {
+  flex: 1;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+.search button {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #ffffff;
+  font-weight: 600;
+}
+
+/* WEATHER INFO */
+.weather-info {
+  margin-top: 1rem;
+}
+
+.city {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.temperature {
+  font-size: 2rem;
+  margin: 0.5rem 0;
+}
+
+.description {
+  opacity: 0.85;
+}
+
+/* DESKTOP ENHANCEMENT */
+@media (min-width: 768px) {
+  .weather-card {
+    max-width: 420px;
+  }
+}
