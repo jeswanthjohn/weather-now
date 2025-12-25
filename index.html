@@ -4,29 +4,31 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Weather App</title>
+    <meta name="description" content="Simple Weather App using OpenWeather API" />
+    <title>Weather Now</title>
     <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-    <main class="app">
-        <section class="weather-card">
-            <h1 class="app-title">Weather</h1>
 
-            <div class="search">
-                <input type="text" id="cityInput" placeholder="Enter city name" aria-label="City name" />
-                <button id="searchBtn">Search</button>
-            </div>
+    <main class="container">
+        <h1>Weather Now</h1>
 
-            <div class="weather-info">
-                <p class="city">—</p>
-                <p class="temperature">— °C</p>
-                <p class="description">Search for a city</p>
-            </div>
-        </section>
+        <form id="weatherForm">
+            <input type="text" id="cityInput" placeholder="Enter city name" aria-label="City name" />
+            <button type="submit" id="searchBtn">Search</button>
+        </form>
+
+        <div id="message" class="message"></div>
+
+        <div id="loader" class="loader hidden">
+            Fetching weather…
+        </div>
+
+        <div id="weatherCard" class="weather-card hidden"></div>
     </main>
 
-    <script src="app.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 
 </html>

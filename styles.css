@@ -1,90 +1,65 @@
-/* RESET */
 * {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  background: #f4f6f8;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* BACKGROUND */
-body {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #74ebd5, #9face6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* APP CONTAINER */
-.app {
-  width: 100%;
-  padding: 1rem;
-}
-
-/* GLASS CARD */
-.weather-card {
-  max-width: 360px;
-  margin: auto;
-  padding: 1.5rem;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+.container {
+  max-width: 420px;
+  margin: 60px auto;
+  padding: 20px;
   text-align: center;
 }
 
-/* TITLE */
-.app-title {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
+h1 {
+  margin-bottom: 20px;
 }
 
-/* SEARCH */
-.search {
+form {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.2rem;
+  gap: 10px;
 }
 
-.search input {
+input {
   flex: 1;
-  padding: 0.6rem;
-  border-radius: 8px;
-  border: none;
-  outline: none;
+  padding: 10px;
+  font-size: 16px;
 }
 
-.search button {
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
-  border: none;
+button {
+  padding: 10px 16px;
   cursor: pointer;
-  background: #ffffff;
-  font-weight: 600;
 }
 
-/* WEATHER INFO */
-.weather-info {
-  margin-top: 1rem;
+button:disabled,
+input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.city {
-  font-size: 1.2rem;
-  font-weight: 600;
+.message {
+  margin-top: 15px;
+  color: #b00020;
 }
 
-.temperature {
-  font-size: 2rem;
-  margin: 0.5rem 0;
+.loader {
+  margin-top: 20px;
+  font-weight: bold;
 }
 
-.description {
-  opacity: 0.85;
+.weather-card {
+  background: white;
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 6px;
+  text-align: left;
 }
 
-/* DESKTOP ENHANCEMENT */
-@media (min-width: 768px) {
-  .weather-card {
-    max-width: 420px;
-  }
+.hidden {
+  display: none;
 }
