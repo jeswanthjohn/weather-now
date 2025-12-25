@@ -66,6 +66,7 @@ function mapWeatherData(data) {
 }
 
 function displayWeather(weather) {
+  messageBox.textContent = ""; 
   weatherCard.innerHTML = `
     <h2>${weather.city}, ${weather.country}</h2>
     <p><strong>Temperature:</strong> ${weather.temperature} °C</p>
