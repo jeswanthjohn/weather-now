@@ -1,4 +1,6 @@
-import { OPENWEATHER_API_KEY } from "./config.js";
+// TEMP: API key inlined for frontend-only static deployment
+// In production, this should be handled via a backend proxy
+const OPENWEATHER_API_KEY = "3597f18c75ed19a425bf9a753cdcf8f3";
 
 const form = document.getElementById("weatherForm");
 const cityInput = document.getElementById("cityInput");
