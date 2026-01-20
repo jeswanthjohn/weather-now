@@ -1,34 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Simple Weather App using OpenWeather API" />
-    <title>Weather Now</title>
-    <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Simple Weather App using OpenWeather API" />
+  <title>Weather Now</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
+  <main class="container">
+    <h1>Weather Now</h1>
 
-    <main class="container">
-        <h1>Weather Now</h1>
+    <form id="weatherForm">
+      <input
+        type="text"
+        id="cityInput"
+        placeholder="Enter city name"
+        aria-label="City name"
+      />
+      <button type="submit" id="searchBtn">Search</button>
+    </form>
 
-        <form id="weatherForm">
-            <input type="text" id="cityInput" placeholder="Enter city name" aria-label="City name" />
-            <button type="submit" id="searchBtn">Search</button>
-        </form>
+    <div id="message" class="message"></div>
 
-        <div id="message" class="message"></div>
+    <div id="loader" class="loader hidden">
+      Fetching weather…
+    </div>
 
-        <div id="loader" class="loader hidden">
-            Fetching weather…
-        </div>
+    <div id="weatherCard" class="weather-card hidden"></div>
+  </main>
 
-        <div id="weatherCard" class="weather-card hidden"></div>
-    </main>
-
-    <script type="module" src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
-
 </html>
