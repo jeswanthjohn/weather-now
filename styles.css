@@ -63,3 +63,15 @@ input:disabled {
 .hidden {
   display: none;
 }
+
+.message.error {
+  display: block;
+  background-color: #fdecea;
+  color: #b00020;
+  border: 1px solid #f5c2c7;
+  padding: 12px;
+  margin-top: 15px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+

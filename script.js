@@ -69,6 +69,8 @@ function mapWeatherData(data) {
 
 function displayWeather(weather) {
   messageBox.textContent = "";
+  messageBox.classList.remove("error");
+
   weatherCard.innerHTML = `
     <h2>${weather.city}, ${weather.country}</h2>
     <p><strong>Temperature:</strong> ${weather.temperature} °C</p>
@@ -86,11 +88,18 @@ function toggleLoading(isLoading) {
   searchBtn.disabled = isLoading;
 }
 
+/* -------------------------
+   UPDATED FUNCTIONS (DAY 2)
+-------------------------- */
+
 function showError(message) {
   messageBox.textContent = message;
+  messageBox.classList.add("error");
+  weatherCard.classList.add("hidden");
 }
 
 function clearUI() {
   messageBox.textContent = "";
+  messageBox.classList.remove("error");
   weatherCard.classList.add("hidden");
 }
