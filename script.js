@@ -13,7 +13,40 @@ const loader = document.getElementById("loader");
 const searchBtn = document.getElementById("searchBtn");
 
 /* -------------------------
-   EVENT HANDLERS
+  | UI STATE MANAGEMENT 
+-------------------------- */
+function setUIState({ loading = false, error = "", weather = null }) {
+  loader.classList.toggle("hidden", !loading);
+  cityInput.disabled = loading;
+  searchBtn.disabled = loading;
+
+  if (error) {
+    messageBox.textContent = error;
+    messageBox.classList.add("error");
+    weatherCard.classList.add("hidden");
+    return;
+  }
+
+  messageBox.textContent = "";
+  messageBox.classList.remove("error");
+
+  if (weather) {
+    weatherCard.innerHTML = `
+      <h2>${weather.city}, ${weather.country}</h2>
+      <p><strong>Temperature:</strong> ${weather.temperature} °C</p>
+      <p><strong>Feels like:</strong> ${weather.feelsLike} °C</p>
+      <p><strong>Humidity:</strong> ${weather.humidity}%</p>
+      <p><strong>Wind:</strong> ${weather.wind} m/s</p>
+      <p><em>${weather.description}</em></p>
+    `;
+    weatherCard.classList.remove("hidden");
+  } else {
+    weatherCard.classList.add("hidden");
+  }
+}
+
+/* -------------------------
+   EVENT HANDLER
 -------------------------- */
 form.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -22,39 +55,36 @@ form.addEventListener("submit", (event) => {
 });
 
 /* -------------------------
-   CORE FUNCTION
+   CORE LOGIC
 -------------------------- */
 async function fetchWeather(city) {
-  resetUI();
+  setUIState({});
 
   if (!city) {
-    showError("Please enter a city name");
+    setUIState({ error: "Please enter a city name" });
     return;
   }
 
-  setLoading(true);
+  setUIState({ loading: true });
 
   try {
     const response = await fetch(buildWeatherURL(city));
 
     if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error("City not found");
-      }
-      if (response.status === 401) {
-        throw new Error("Service unavailable");
-      }
+      if (response.status === 404) throw new Error("City not found");
+      if (response.status === 401) throw new Error("Service unavailable");
       throw new Error("Failed to fetch weather data");
     }
 
     const rawData = await response.json();
     const weather = mapWeatherData(rawData);
-    renderWeather(weather);
+
+    setUIState({ weather });
 
   } catch (error) {
-    showError(error.message);
+    setUIState({ error: error.message });
   } finally {
-    setLoading(false);
+    setUIState({ loading: false });
   }
 }
 
@@ -76,41 +106,4 @@ function mapWeatherData(data) {
     wind: data.wind.speed,
     description: data.weather[0].description,
   };
-}
-
-function renderWeather(weather) {
-  messageBox.textContent = "";
-  messageBox.classList.remove("error");
-
-  weatherCard.innerHTML = `
-    <h2>${weather.city}, ${weather.country}</h2>
-    <p><strong>Temperature:</strong> ${weather.temperature} °C</p>
-    <p><strong>Feels like:</strong> ${weather.feelsLike} °C</p>
-    <p><strong>Humidity:</strong> ${weather.humidity}%</p>
-    <p><strong>Wind:</strong> ${weather.wind} m/s</p>
-    <p><em>${weather.description}</em></p>
-  `;
-
-  weatherCard.classList.remove("hidden");
-}
-
-/* -------------------------
-   UI STATE
--------------------------- */
-function setLoading(isLoading) {
-  loader.classList.toggle("hidden", !isLoading);
-  cityInput.disabled = isLoading;
-  searchBtn.disabled = isLoading;
-}
-
-function showError(message) {
-  messageBox.textContent = message;
-  messageBox.classList.add("error");
-  weatherCard.classList.add("hidden");
-}
-
-function resetUI() {
-  messageBox.textContent = "";
-  messageBox.classList.remove("error");
-  weatherCard.classList.add("hidden");
 }
