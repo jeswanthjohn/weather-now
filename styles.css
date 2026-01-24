@@ -42,26 +42,12 @@ input:disabled {
   cursor: not-allowed;
 }
 
+/* -------------------------
+   MESSAGE & LOADER
+-------------------------- */
 .message {
   margin-top: 15px;
   color: #b00020;
-}
-
-.loader {
-  margin-top: 20px;
-  font-weight: bold;
-}
-
-.weather-card {
-  background: white;
-  margin-top: 20px;
-  padding: 15px;
-  border-radius: 6px;
-  text-align: left;
-}
-
-.hidden {
-  display: none;
 }
 
 .message.error {
@@ -75,3 +61,35 @@ input:disabled {
   font-weight: 500;
 }
 
+.loader {
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+/* -------------------------
+   WEATHER CARD
+-------------------------- */
+.weather-card {
+  background: white;
+  margin-top: 24px;          /* improved vertical separation */
+  padding: 18px;             /* more breathing room */
+  border-radius: 6px;
+  text-align: left;
+}
+
+.weather-card h2 {
+  margin-bottom: 12px;       /* clearer title separation */
+  font-size: 20px;
+}
+
+.weather-card p {
+  margin: 6px 0;             /* tighter but readable spacing */
+  line-height: 1.45;         /* readability improvement */
+}
+
+/* -------------------------
+   UTILITIES
+-------------------------- */
+.hidden {
+  display: none;
+}
