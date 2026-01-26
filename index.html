@@ -2,39 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Simple Weather App using OpenWeather API" />
   <title>Weather Now</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
-  <main class="container">
+
+  <main class="app">
     <h1>Weather Now</h1>
 
-    <form id="weatherForm" autocomplete="off">
+    <form id="weatherForm">
       <input
         type="text"
         id="cityInput"
         placeholder="Enter city name"
-        aria-label="City name"
+        autocomplete="off"
       />
       <button type="submit" id="searchBtn">Search</button>
     </form>
 
-    <div
-      id="message"
-      class="message"
-      aria-live="polite"
-    ></div>
+    <!-- Message / Error -->
+    <p id="message"></p>
 
-    <div id="loader" class="loader hidden">
-      Fetching weather…
-    </div>
+    <!-- Loader (hidden by default) -->
+    <div id="loader" class="loader hidden">Fetching details...</div>
 
+    <!-- Weather Card -->
     <div id="weatherCard" class="weather-card hidden"></div>
   </main>
 
-  <script type="module" src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

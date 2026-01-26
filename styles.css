@@ -1,95 +1,70 @@
 * {
   box-sizing: border-box;
+  font-family: system-ui, sans-serif;
 }
 
 body {
-  font-family: system-ui, sans-serif;
-  background: #f4f6f8;
   margin: 0;
-  padding: 0;
+  background: #0f172a;
+  color: #e5e7eb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
-.container {
+.app {
+  width: 100%;
   max-width: 420px;
-  margin: 60px auto;
-  padding: 20px;
-  text-align: center;
-}
-
-h1 {
-  margin-bottom: 20px;
+  padding: 1.5rem;
+  background: #020617;
+  border-radius: 12px;
 }
 
 form {
   display: flex;
-  gap: 10px;
+  gap: 0.5rem;
 }
 
 input {
   flex: 1;
-  padding: 10px;
-  font-size: 16px;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: none;
 }
 
 button {
-  padding: 10px 16px;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
 }
 
-button:disabled,
-input:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+#message {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
 }
 
-/* -------------------------
-   MESSAGE & LOADER
--------------------------- */
-.message {
-  margin-top: 15px;
-  color: #b00020;
-}
-
-.message.error {
-  display: block;
-  background-color: #fdecea;
-  color: #b00020;
-  border: 1px solid #f5c2c7;
-  padding: 12px;
-  margin-top: 15px;
-  border-radius: 4px;
-  font-weight: 500;
+#message.error {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  padding: 0.5rem;
+  border-radius: 6px;
 }
 
 .loader {
-  margin-top: 20px;
-  font-weight: bold;
+  margin-top: 1rem;
+  opacity: 0.8;
 }
 
-/* -------------------------
-   WEATHER CARD
--------------------------- */
 .weather-card {
-  background: white;
-  margin-top: 24px;          /* improved vertical separation */
-  padding: 18px;             /* more breathing room */
-  border-radius: 6px;
-  text-align: left;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #020617;
+  border: 1px solid #334155;
+  border-radius: 8px;
 }
 
-.weather-card h2 {
-  margin-bottom: 12px;       /* clearer title separation */
-  font-size: 20px;
-}
-
-.weather-card p {
-  margin: 6px 0;             /* tighter but readable spacing */
-  line-height: 1.45;         /* readability improvement */
-}
-
-/* -------------------------
-   UTILITIES
--------------------------- */
 .hidden {
   display: none;
 }

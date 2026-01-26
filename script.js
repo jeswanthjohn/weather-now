@@ -1,5 +1,6 @@
 // TEMP: API key inlined for frontend-only static deployment
 // In production, this should be handled via a backend proxy
+
 const OPENWEATHER_API_KEY = "3597f18c75ed19a425bf9a753cdcf8f3";
 
 /* -------------------------
@@ -13,43 +14,42 @@ const loader = document.getElementById("loader");
 const searchBtn = document.getElementById("searchBtn");
 
 /* -------------------------
-  | UI STATE MANAGEMENT 
+   UI HELPERS
 -------------------------- */
-function setUIState({ loading = false, error = "", weather = null }) {
-  loader.classList.toggle("hidden", !loading);
-  cityInput.disabled = loading;
-  searchBtn.disabled = loading;
+function showLoading(isLoading) {
+  loader.classList.toggle("hidden", !isLoading);
+  cityInput.disabled = isLoading;
+  searchBtn.disabled = isLoading;
+}
 
-  if (error) {
-    messageBox.textContent = error;
-    messageBox.classList.add("error");
-    weatherCard.classList.add("hidden");
-    return;
-  }
+function showError(message) {
+  messageBox.textContent = message;
+  messageBox.classList.add("error");
+  weatherCard.classList.add("hidden");
+}
 
+function clearError() {
   messageBox.textContent = "";
   messageBox.classList.remove("error");
+}
 
-  if (weather) {
-    weatherCard.innerHTML = `
-      <h2>${weather.city}, ${weather.country}</h2>
-      <p><strong>Temperature:</strong> ${weather.temperature} °C</p>
-      <p><strong>Feels like:</strong> ${weather.feelsLike} °C</p>
-      <p><strong>Humidity:</strong> ${weather.humidity}%</p>
-      <p><strong>Wind:</strong> ${weather.wind} m/s</p>
-      <p><em>${weather.description}</em></p>
-    `;
-    weatherCard.classList.remove("hidden");
-  } else {
-    weatherCard.classList.add("hidden");
-  }
+function renderWeather(data) {
+  weatherCard.innerHTML = `
+    <h2>${data.name}, ${data.sys.country}</h2>
+    <p><strong>Temperature:</strong> ${data.main.temp} °C</p>
+    <p><strong>Feels like:</strong> ${data.main.feels_like} °C</p>
+    <p><strong>Humidity:</strong> ${data.main.humidity}%</p>
+    <p><strong>Wind:</strong> ${data.wind.speed} m/s</p>
+    <p><em>${data.weather[0].description}</em></p>
+  `;
+  weatherCard.classList.remove("hidden");
 }
 
 /* -------------------------
-   EVENT HANDLER
+   EVENT
 -------------------------- */
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
   const city = cityInput.value.trim();
   fetchWeather(city);
 });
@@ -58,52 +58,40 @@ form.addEventListener("submit", (event) => {
    CORE LOGIC
 -------------------------- */
 async function fetchWeather(city) {
-  setUIState({});
+  clearError();
+  weatherCard.classList.add("hidden");
 
   if (!city) {
-    setUIState({ error: "Please enter a city name" });
+    showError("Please enter a city name");
     return;
   }
 
-  setUIState({ loading: true });
+  showLoading(true);
 
   try {
-    const response = await fetch(buildWeatherURL(city));
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
+      city
+    )}&units=metric&appid=${OPENWEATHER_API_KEY}`;
 
-    if (!response.ok) {
-      if (response.status === 404) throw new Error("City not found");
-      if (response.status === 401) throw new Error("Service unavailable");
-      throw new Error("Failed to fetch weather data");
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.cod !== 200) {
+      throw new Error(data.message || "City not found");
     }
 
-    const rawData = await response.json();
-    const weather = mapWeatherData(rawData);
+    renderWeather(data);
 
-    setUIState({ weather });
-
-  } catch (error) {
-    setUIState({ error: error.message });
+  } catch (err) {
+    showError(err.message);
   } finally {
-    setUIState({ loading: false });
+    showLoading(false);
   }
 }
 
 /* -------------------------
-   HELPERS
+   INITIAL UI STATE (CRITICAL)
 -------------------------- */
-function buildWeatherURL(city) {
-  const baseURL = "https://api.openweathermap.org/data/2.5/weather";
-  return `${baseURL}?q=${encodeURIComponent(city)}&units=metric&appid=${OPENWEATHER_API_KEY}`;
-}
-
-function mapWeatherData(data) {
-  return {
-    city: data.name,
-    country: data.sys.country,
-    temperature: data.main.temp,
-    feelsLike: data.main.feels_like,
-    humidity: data.main.humidity,
-    wind: data.wind.speed,
-    description: data.weather[0].description,
-  };
-}
+showLoading(false);
+clearError();
+weatherCard.classList.add("hidden");
