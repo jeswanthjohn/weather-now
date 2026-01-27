@@ -18,6 +18,7 @@ const searchBtn = document.getElementById("searchBtn");
 -------------------------- */
 function showLoading(isLoading) {
   loader.classList.toggle("hidden", !isLoading);
+  loader.setAttribute("aria-busy", String(isLoading));
   cityInput.disabled = isLoading;
   searchBtn.disabled = isLoading;
 }
@@ -62,7 +63,7 @@ async function fetchWeather(city) {
   weatherCard.classList.add("hidden");
 
   if (!city) {
-    showError("Please enter a city name");
+    showError("Please enter a city name to get the weather.");
     return;
   }
 
@@ -77,7 +78,10 @@ async function fetchWeather(city) {
     const data = await response.json();
 
     if (data.cod !== 200) {
-      throw new Error(data.message || "City not found");
+      if (data.cod === "404") {
+        throw new Error("We couldn’t find that city. Please check the spelling.");
+      }
+      throw new Error("Something went wrong. Please try again.");
     }
 
     renderWeather(data);

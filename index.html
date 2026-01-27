@@ -11,24 +11,49 @@
   <main class="app">
     <h1>Weather Now</h1>
 
-    <form id="weatherForm">
+    <form id="weatherForm" autocomplete="off" novalidate>
       <input
         type="text"
         id="cityInput"
         placeholder="Enter city name"
         autocomplete="off"
+        aria-label="City name"
+        aria-required="true"
+        required
       />
-      <button type="submit" id="searchBtn">Search</button>
+      <button
+        type="submit"
+        id="searchBtn"
+        aria-label="Search weather"
+      >
+        Search
+      </button>
     </form>
 
     <!-- Message / Error -->
-    <p id="message"></p>
+    <p
+      id="message"
+      role="alert"
+      aria-live="polite"
+    ></p>
 
     <!-- Loader (hidden by default) -->
-    <div id="loader" class="loader hidden">Fetching details...</div>
+    <div
+      id="loader"
+      class="loader hidden"
+      role="status"
+      aria-live="polite"
+      aria-busy="false"
+    >
+      Fetching details...
+    </div>
 
     <!-- Weather Card -->
-    <div id="weatherCard" class="weather-card hidden"></div>
+    <div
+      id="weatherCard"
+      class="weather-card hidden"
+      aria-live="polite"
+    ></div>
   </main>
 
   <script src="script.js"></script>
