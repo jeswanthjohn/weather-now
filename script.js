@@ -4,7 +4,7 @@
 
 // TEMP: API key inlined for frontend-only static deployment
 // In production, this should be handled via environment variables
-const API_KEY = "YOUR_OPENWEATHER_API_KEY";
+const API_KEY = "3597f18c75ed19a425bf9a753cdcf8f3";
 const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 
 // ===============================
@@ -23,10 +23,12 @@ const loader = document.getElementById("loader");
 
 function showLoader() {
   loader.style.display = "block";
+  cityInput.disabled = true;
 }
 
 function hideLoader() {
   loader.style.display = "none";
+  cityInput.disabled = false;
 }
 
 function showMessage(text, type = "info") {
@@ -41,6 +43,7 @@ function clearMessage() {
 
 function resetWeatherCard() {
   weatherCard.innerHTML = "";
+  weatherCard.classList.add("hidden");
 }
 
 // ===============================
@@ -58,22 +61,31 @@ function renderWeather(weatherData) {
     <p>💧 Humidity: ${humidity}%</p>
     <p>☁️ ${description}</p>
   `;
+
+  weatherCard.classList.remove("hidden");
 }
 
 // ===============================
-// API Layer
+// API Layer (CORRECT + ROBUST)
 // ===============================
 
 async function fetchWeatherForCity(city) {
-  const requestUrl = `${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`;
+  const requestUrl = `${BASE_URL}?q=${encodeURIComponent(
+    city
+  )}&appid=${API_KEY}&units=metric`;
 
   const response = await fetch(requestUrl);
+  const data = await response.json();
 
-  if (!response.ok) {
-    throw new Error("City not found");
+  // OpenWeather uses `cod` in payload (number or string)
+  if (data.cod !== 200) {
+    if (data.cod === "404") {
+      throw new Error("City not found");
+    }
+    throw new Error("Unable to fetch weather data");
   }
 
-  return response.json();
+  return data;
 }
 
 // ===============================
@@ -117,3 +129,11 @@ function handleFormSubmit(event) {
 // ===============================
 
 form.addEventListener("submit", handleFormSubmit);
+
+// ===============================
+// Initial UI State
+// ===============================
+
+resetWeatherCard();
+clearMessage();
+hideLoader();
