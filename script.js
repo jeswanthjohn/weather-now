@@ -95,7 +95,7 @@ function renderWeather(weatherData) {
 }
 
 // ===============================
-// API Layer (Improved Error Handling)
+// API Layer
 // ===============================
 
 async function fetchWeatherForCity(city) {
@@ -126,6 +126,7 @@ async function fetchWeatherForCity(city) {
 // ===============================
 
 async function loadWeather(city) {
+  // 🔴 CRITICAL: Prevent duplicate API calls
   if (isFetching) return;
 
   isFetching = true;
@@ -134,19 +135,12 @@ async function loadWeather(city) {
   clearMessage();
   showLoader();
 
-  const timeout = setTimeout(() => {
-    showMessage("Request timed out. Please try again.", "error");
-    hideLoader();
-    isFetching = false;
-  }, 8000);
-
   try {
     const weatherData = await fetchWeatherForCity(city);
     renderWeather(weatherData);
   } catch (error) {
     showMessage(error.message, "error");
   } finally {
-    clearTimeout(timeout);
     hideLoader();
     isFetching = false;
   }
@@ -160,6 +154,9 @@ function handleFormSubmit(event) {
   event.preventDefault();
 
   clearMessage();
+
+  // 🔴 EXTRA SAFETY: block submission if already fetching
+  if (isFetching) return;
 
   const city = cityInput.value;
 
@@ -177,15 +174,7 @@ function handleFormSubmit(event) {
 // Event Listeners
 // ===============================
 
-// Form submit
 form.addEventListener("submit", handleFormSubmit);
-
-// Enter key support (extra safety)
-cityInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    handleFormSubmit(e);
-  }
-});
 
 // ===============================
 // Initial UI State
