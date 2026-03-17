@@ -18,6 +18,12 @@ const messageBox = document.getElementById("message");
 const loader = document.getElementById("loader");
 
 // ===============================
+// State Control
+// ===============================
+
+let isFetching = false;
+
+// ===============================
 // UI State Helpers
 // ===============================
 
@@ -47,6 +53,29 @@ function resetWeatherCard() {
 }
 
 // ===============================
+// Validation
+// ===============================
+
+function validateCity(city) {
+  const trimmed = city.trim();
+
+  if (!trimmed) {
+    return "Please enter a city name";
+  }
+
+  if (trimmed.length < 2) {
+    return "City name must be at least 2 characters";
+  }
+
+  const regex = /^[a-zA-Z\s]+$/;
+  if (!regex.test(trimmed)) {
+    return "City name can only contain letters and spaces";
+  }
+
+  return null;
+}
+
+// ===============================
 // Weather Rendering
 // ===============================
 
@@ -66,7 +95,7 @@ function renderWeather(weatherData) {
 }
 
 // ===============================
-// API Layer (CORRECT + ROBUST)
+// API Layer (Improved Error Handling)
 // ===============================
 
 async function fetchWeatherForCity(city) {
@@ -77,11 +106,15 @@ async function fetchWeatherForCity(city) {
   const response = await fetch(requestUrl);
   const data = await response.json();
 
-  // OpenWeather uses `cod` in payload (number or string)
-  if (data.cod !== 200) {
-    if (data.cod === "404") {
-      throw new Error("City not found");
-    }
+  if (response.status === 404 || data.cod === "404") {
+    throw new Error("City not found");
+  }
+
+  if (response.status === 401) {
+    throw new Error("Invalid API key");
+  }
+
+  if (!response.ok) {
     throw new Error("Unable to fetch weather data");
   }
 
@@ -93,9 +126,19 @@ async function fetchWeatherForCity(city) {
 // ===============================
 
 async function loadWeather(city) {
+  if (isFetching) return;
+
+  isFetching = true;
+
   resetWeatherCard();
   clearMessage();
   showLoader();
+
+  const timeout = setTimeout(() => {
+    showMessage("Request timed out. Please try again.", "error");
+    hideLoader();
+    isFetching = false;
+  }, 8000);
 
   try {
     const weatherData = await fetchWeatherForCity(city);
@@ -103,7 +146,9 @@ async function loadWeather(city) {
   } catch (error) {
     showMessage(error.message, "error");
   } finally {
+    clearTimeout(timeout);
     hideLoader();
+    isFetching = false;
   }
 }
 
@@ -114,21 +159,33 @@ async function loadWeather(city) {
 function handleFormSubmit(event) {
   event.preventDefault();
 
-  const city = cityInput.value.trim();
+  clearMessage();
 
-  if (!city) {
-    showMessage("Please enter a city name", "warning");
+  const city = cityInput.value;
+
+  const validationError = validateCity(city);
+
+  if (validationError) {
+    showMessage(validationError, "warning");
     return;
   }
 
-  loadWeather(city);
+  loadWeather(city.trim());
 }
 
 // ===============================
 // Event Listeners
 // ===============================
 
+// Form submit
 form.addEventListener("submit", handleFormSubmit);
+
+// Enter key support (extra safety)
+cityInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    handleFormSubmit(e);
+  }
+});
 
 // ===============================
 // Initial UI State
