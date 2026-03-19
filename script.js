@@ -95,7 +95,7 @@ function renderWeather(weatherData) {
 }
 
 // ===============================
-// API Layer
+// API Layer (Improved Error Granularity)
 // ===============================
 
 async function fetchWeatherForCity(city) {
@@ -103,9 +103,25 @@ async function fetchWeatherForCity(city) {
     city
   )}&appid=${API_KEY}&units=metric`;
 
-  const response = await fetch(requestUrl);
-  const data = await response.json();
+  let response;
 
+  try {
+    response = await fetch(requestUrl);
+  } catch (networkError) {
+    // 🔴 Network failure (offline, DNS, etc.)
+    throw new Error("Network error. Please check your connection.");
+  }
+
+  let data;
+
+  try {
+    data = await response.json();
+  } catch {
+    // 🔴 Invalid JSON response
+    throw new Error("Invalid response from weather service");
+  }
+
+  // 🔴 API-specific errors
   if (response.status === 404 || data.cod === "404") {
     throw new Error("City not found");
   }
@@ -114,8 +130,12 @@ async function fetchWeatherForCity(city) {
     throw new Error("Invalid API key");
   }
 
+  if (response.status >= 500) {
+    throw new Error("Weather service is currently unavailable");
+  }
+
   if (!response.ok) {
-    throw new Error("Unable to fetch weather data");
+    throw new Error(data?.message || "Unable to fetch weather data");
   }
 
   return data;
@@ -126,7 +146,6 @@ async function fetchWeatherForCity(city) {
 // ===============================
 
 async function loadWeather(city) {
-  // 🔴 CRITICAL: Prevent duplicate API calls
   if (isFetching) return;
 
   isFetching = true;
@@ -139,7 +158,10 @@ async function loadWeather(city) {
     const weatherData = await fetchWeatherForCity(city);
     renderWeather(weatherData);
   } catch (error) {
-    showMessage(error.message, "error");
+    // 🔴 Final safety fallback
+    const message =
+      error?.message || "Something went wrong. Please try again.";
+    showMessage(message, "error");
   } finally {
     hideLoader();
     isFetching = false;
@@ -155,7 +177,6 @@ function handleFormSubmit(event) {
 
   clearMessage();
 
-  // 🔴 EXTRA SAFETY: block submission if already fetching
   if (isFetching) return;
 
   const city = cityInput.value;
