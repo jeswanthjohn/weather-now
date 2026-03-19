@@ -95,7 +95,7 @@ function renderWeather(weatherData) {
 }
 
 // ===============================
-// API Layer (Improved Error Granularity)
+// API Layer
 // ===============================
 
 async function fetchWeatherForCity(city) {
@@ -107,8 +107,7 @@ async function fetchWeatherForCity(city) {
 
   try {
     response = await fetch(requestUrl);
-  } catch (networkError) {
-    // 🔴 Network failure (offline, DNS, etc.)
+  } catch {
     throw new Error("Network error. Please check your connection.");
   }
 
@@ -117,11 +116,9 @@ async function fetchWeatherForCity(city) {
   try {
     data = await response.json();
   } catch {
-    // 🔴 Invalid JSON response
     throw new Error("Invalid response from weather service");
   }
 
-  // 🔴 API-specific errors
   if (response.status === 404 || data.cod === "404") {
     throw new Error("City not found");
   }
@@ -158,10 +155,17 @@ async function loadWeather(city) {
     const weatherData = await fetchWeatherForCity(city);
     renderWeather(weatherData);
   } catch (error) {
-    // 🔴 Final safety fallback
     const message =
       error?.message || "Something went wrong. Please try again.";
+
     showMessage(message, "error");
+
+    // ✅ UX Improvement: focus input for quick retry
+    cityInput.focus();
+
+    // ✅ Move cursor to end
+    const length = cityInput.value.length;
+    cityInput.setSelectionRange(length, length);
   } finally {
     hideLoader();
     isFetching = false;
@@ -185,6 +189,9 @@ function handleFormSubmit(event) {
 
   if (validationError) {
     showMessage(validationError, "warning");
+
+    // ✅ UX: focus input on validation error
+    cityInput.focus();
     return;
   }
 
