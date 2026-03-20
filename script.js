@@ -160,12 +160,8 @@ async function loadWeather(city) {
 
     showMessage(message, "error");
 
-    // ✅ UX Improvement: focus input for quick retry
+    // ✅ Accessibility: return focus to input on error
     cityInput.focus();
-
-    // ✅ Move cursor to end
-    const length = cityInput.value.length;
-    cityInput.setSelectionRange(length, length);
   } finally {
     hideLoader();
     isFetching = false;
@@ -190,7 +186,7 @@ function handleFormSubmit(event) {
   if (validationError) {
     showMessage(validationError, "warning");
 
-    // ✅ UX: focus input on validation error
+    // ✅ Accessibility: focus input for correction
     cityInput.focus();
     return;
   }
@@ -211,3 +207,6 @@ form.addEventListener("submit", handleFormSubmit);
 resetWeatherCard();
 clearMessage();
 hideLoader();
+
+// ✅ Accessibility: focus input on page load
+cityInput.focus();
