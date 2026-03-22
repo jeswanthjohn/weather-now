@@ -14,6 +14,14 @@ https://weather-now-jeswanth.netlify.app/
 - Accessible form inputs and user feedback messages  
 - Clear separation of UI logic, API logic, and application flow  
 
+### Accessibility Considerations
+
+- Input focus is managed to support keyboard-first interaction  
+- Error and status messages are clearly surfaced to users  
+- Form behavior is predictable and does not rely on mouse interactions  
+
+These improvements ensure the application remains usable across different interaction patterns.
+
 ### Tech Stack
 
 - HTML5  
@@ -27,13 +35,35 @@ https://weather-now-jeswanth.netlify.app/
 - The user submits a city name through a semantic and accessible form  
 - The application requests weather data from the OpenWeather API  
 - UI updates are managed through explicit loading and visibility states  
-- Invalid inputs and API errors are handled gracefully without breaking the user experience  
+- Invalid inputs and API errors are handled gracefully without breaking the user experience
+
+### API Flow & State Management
+
+The application follows a controlled request lifecycle to ensure predictable UI behavior:
+
+1. Input is validated before any API request is made  
+2. A request lock (`isFetching`) prevents duplicate API calls during active requests  
+3. The UI transitions into a loading state while disabling user input  
+4. API responses are processed and mapped to UI updates (success or error)  
+5. The loading state is cleared and input is re-enabled after completion  
+
+This approach ensures consistent user experience and prevents race conditions during rapid interactions.
 
 ### Known Limitations
 
 - The API key is exposed on the frontend and is intended for demo purposes only  
 - No caching is implemented for repeated city searches  
 - The application is not production-ready without a backend proxy  
+
+### Error Handling Strategy
+
+The application distinguishes between different failure scenarios to provide meaningful feedback:
+
+- Network failures (e.g., offline or connectivity issues)  
+- API-level errors (e.g., invalid city, unauthorized access)  
+- Unexpected or malformed responses  
+
+Errors are caught and surfaced through a centralized UI messaging system, ensuring that failures do not break the application flow.
 
 ### Environment Setup (Local)
 
