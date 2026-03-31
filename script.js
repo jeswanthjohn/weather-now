@@ -2,8 +2,6 @@
 // Configuration
 // ===============================
 
-// TEMP: API key inlined for frontend-only static deployment
-// In production, this should be handled via environment variables
 const API_KEY = "3597f18c75ed19a425bf9a753cdcf8f3";
 const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 
@@ -28,12 +26,14 @@ let isFetching = false;
 // ===============================
 
 function showLoader() {
-  loader.style.display = "block";
+  loader.classList.remove("hidden");
+  loader.setAttribute("aria-busy", "true");
   cityInput.disabled = true;
 }
 
 function hideLoader() {
-  loader.style.display = "none";
+  loader.classList.add("hidden");
+  loader.setAttribute("aria-busy", "false");
   cityInput.disabled = false;
 }
 
@@ -59,18 +59,14 @@ function resetWeatherCard() {
 function validateCity(city) {
   const trimmed = city.trim();
 
-  if (!trimmed) {
-    return "Please enter a city name";
-  }
+  if (!trimmed) return "Please enter a city name";
 
-  if (trimmed.length < 2) {
+  if (trimmed.length < 2)
     return "City name must be at least 2 characters";
-  }
 
   const regex = /^[a-zA-Z\s]+$/;
-  if (!regex.test(trimmed)) {
+  if (!regex.test(trimmed))
     return "City name can only contain letters and spaces";
-  }
 
   return null;
 }
@@ -80,9 +76,15 @@ function validateCity(city) {
 // ===============================
 
 function renderWeather(weatherData) {
-  const { name } = weatherData;
-  const { temp, humidity } = weatherData.main;
-  const description = weatherData.weather[0].description;
+  const name = weatherData?.name;
+  const temp = weatherData?.main?.temp;
+  const humidity = weatherData?.main?.humidity;
+  const description = weatherData?.weather?.[0]?.description;
+
+  // ✅ Defensive rendering (production safety)
+  if (!name || temp == null || humidity == null || !description) {
+    throw new Error("Incomplete data received from weather service");
+  }
 
   weatherCard.innerHTML = `
     <h2>${name}</h2>
@@ -105,9 +107,10 @@ async function fetchWeatherForCity(city) {
 
   let response;
 
+  // ✅ Clear network failure handling
   try {
     response = await fetch(requestUrl);
-  } catch {
+  } catch (error) {
     throw new Error("Network error. Please check your connection.");
   }
 
@@ -119,6 +122,7 @@ async function fetchWeatherForCity(city) {
     throw new Error("Invalid response from weather service");
   }
 
+  // ✅ Explicit API error handling
   if (response.status === 404 || data.cod === "404") {
     throw new Error("City not found");
   }
@@ -160,9 +164,10 @@ async function loadWeather(city) {
 
     showMessage(message, "error");
 
-    // ✅ Accessibility: return focus to input on error
+    // Accessibility: focus input on error
     cityInput.focus();
   } finally {
+    // ✅ Guaranteed loader cleanup (critical)
     hideLoader();
     isFetching = false;
   }
@@ -185,8 +190,6 @@ function handleFormSubmit(event) {
 
   if (validationError) {
     showMessage(validationError, "warning");
-
-    // ✅ Accessibility: focus input for correction
     cityInput.focus();
     return;
   }
@@ -208,5 +211,4 @@ resetWeatherCard();
 clearMessage();
 hideLoader();
 
-// ✅ Accessibility: focus input on page load
 cityInput.focus();
