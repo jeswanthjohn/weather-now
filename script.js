@@ -19,7 +19,7 @@ const loader = document.getElementById("loader");
 // State Control
 // ===============================
 
-let controller = null; // ✅ NEW: tracks active request
+let controller = null;
 
 // ===============================
 // UI State Helpers
@@ -52,20 +52,29 @@ function resetWeatherCard() {
   weatherCard.classList.add("hidden");
 }
 
+// ✅ NEW: Centralized UI reset
+function resetUI() {
+  resetWeatherCard();
+  clearMessage();
+}
+
 // ===============================
-// Validation
+// Validation + Normalization
 // ===============================
+
+// ✅ NEW: single normalization point
+function normalizeCity(city) {
+  return city.trim();
+}
 
 function validateCity(city) {
-  const trimmed = city.trim();
+  if (!city) return "Please enter a city name";
 
-  if (!trimmed) return "Please enter a city name";
-
-  if (trimmed.length < 2)
+  if (city.length < 2)
     return "City name must be at least 2 characters";
 
   const regex = /^[a-zA-Z\s]+$/;
-  if (!regex.test(trimmed))
+  if (!regex.test(city))
     return "City name can only contain letters and spaces";
 
   return null;
@@ -109,9 +118,7 @@ async function fetchWeatherForCity(city, signal) {
   try {
     response = await fetch(requestUrl, { signal });
   } catch (error) {
-    if (error.name === "AbortError") {
-      throw error; // let caller handle silently
-    }
+    if (error.name === "AbortError") throw error;
     throw new Error("Network error. Please check your connection.");
   }
 
@@ -147,7 +154,6 @@ async function fetchWeatherForCity(city, signal) {
 // ===============================
 
 async function loadWeather(city) {
-  // ✅ Cancel previous request if exists
   if (controller) {
     controller.abort();
   }
@@ -155,15 +161,13 @@ async function loadWeather(city) {
   controller = new AbortController();
   const signal = controller.signal;
 
-  resetWeatherCard();
-  clearMessage();
+  resetUI();
   showLoader();
 
   try {
     const weatherData = await fetchWeatherForCity(city, signal);
     renderWeather(weatherData);
   } catch (error) {
-    // ✅ Ignore aborted requests completely
     if (error.name === "AbortError") return;
 
     const message =
@@ -172,7 +176,9 @@ async function loadWeather(city) {
     showMessage(message, "error");
     cityInput.focus();
   } finally {
-    hideLoader();
+    if (!signal.aborted) {
+      hideLoader();
+    }
   }
 }
 
@@ -185,7 +191,10 @@ function handleFormSubmit(event) {
 
   clearMessage();
 
-  const city = cityInput.value;
+  const rawCity = cityInput.value;
+
+  // ✅ Normalize once
+  const city = normalizeCity(rawCity);
 
   const validationError = validateCity(city);
 
@@ -195,7 +204,7 @@ function handleFormSubmit(event) {
     return;
   }
 
-  loadWeather(city.trim());
+  loadWeather(city);
 }
 
 // ===============================
@@ -208,8 +217,7 @@ form.addEventListener("submit", handleFormSubmit);
 // Initial UI State
 // ===============================
 
-resetWeatherCard();
-clearMessage();
+resetUI();
 hideLoader();
 
 cityInput.focus();
