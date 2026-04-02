@@ -19,7 +19,7 @@ const loader = document.getElementById("loader");
 // State Control
 // ===============================
 
-let isFetching = false;
+let controller = null; // ✅ NEW: tracks active request
 
 // ===============================
 // UI State Helpers
@@ -81,7 +81,6 @@ function renderWeather(weatherData) {
   const humidity = weatherData?.main?.humidity;
   const description = weatherData?.weather?.[0]?.description;
 
-  // ✅ Defensive rendering (production safety)
   if (!name || temp == null || humidity == null || !description) {
     throw new Error("Incomplete data received from weather service");
   }
@@ -100,17 +99,19 @@ function renderWeather(weatherData) {
 // API Layer
 // ===============================
 
-async function fetchWeatherForCity(city) {
+async function fetchWeatherForCity(city, signal) {
   const requestUrl = `${BASE_URL}?q=${encodeURIComponent(
     city
   )}&appid=${API_KEY}&units=metric`;
 
   let response;
 
-  // ✅ Clear network failure handling
   try {
-    response = await fetch(requestUrl);
+    response = await fetch(requestUrl, { signal });
   } catch (error) {
+    if (error.name === "AbortError") {
+      throw error; // let caller handle silently
+    }
     throw new Error("Network error. Please check your connection.");
   }
 
@@ -122,7 +123,6 @@ async function fetchWeatherForCity(city) {
     throw new Error("Invalid response from weather service");
   }
 
-  // ✅ Explicit API error handling
   if (response.status === 404 || data.cod === "404") {
     throw new Error("City not found");
   }
@@ -147,29 +147,32 @@ async function fetchWeatherForCity(city) {
 // ===============================
 
 async function loadWeather(city) {
-  if (isFetching) return;
+  // ✅ Cancel previous request if exists
+  if (controller) {
+    controller.abort();
+  }
 
-  isFetching = true;
+  controller = new AbortController();
+  const signal = controller.signal;
 
   resetWeatherCard();
   clearMessage();
   showLoader();
 
   try {
-    const weatherData = await fetchWeatherForCity(city);
+    const weatherData = await fetchWeatherForCity(city, signal);
     renderWeather(weatherData);
   } catch (error) {
+    // ✅ Ignore aborted requests completely
+    if (error.name === "AbortError") return;
+
     const message =
       error?.message || "Something went wrong. Please try again.";
 
     showMessage(message, "error");
-
-    // Accessibility: focus input on error
     cityInput.focus();
   } finally {
-    // ✅ Guaranteed loader cleanup (critical)
     hideLoader();
-    isFetching = false;
   }
 }
 
@@ -181,8 +184,6 @@ function handleFormSubmit(event) {
   event.preventDefault();
 
   clearMessage();
-
-  if (isFetching) return;
 
   const city = cityInput.value;
 
