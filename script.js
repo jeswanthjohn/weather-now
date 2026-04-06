@@ -20,6 +20,7 @@ const loader = document.getElementById("loader");
 // ===============================
 
 let controller = null;
+let lastSearchedCity = null; // ✅ NEW
 
 // ===============================
 // UI State Helpers
@@ -52,7 +53,6 @@ function resetWeatherCard() {
   weatherCard.classList.add("hidden");
 }
 
-// ✅ NEW: Centralized UI reset
 function resetUI() {
   resetWeatherCard();
   clearMessage();
@@ -62,9 +62,8 @@ function resetUI() {
 // Validation + Normalization
 // ===============================
 
-// ✅ NEW: single normalization point
 function normalizeCity(city) {
-  return city.trim();
+  return city.trim().toLowerCase(); // ✅ normalize consistently
 }
 
 function validateCity(city) {
@@ -154,6 +153,12 @@ async function fetchWeatherForCity(city, signal) {
 // ===============================
 
 async function loadWeather(city) {
+  // ✅ Prevent redundant API calls
+  if (lastSearchedCity === city) {
+    showMessage("Already showing weather for this city", "info");
+    return;
+  }
+
   if (controller) {
     controller.abort();
   }
@@ -167,6 +172,10 @@ async function loadWeather(city) {
   try {
     const weatherData = await fetchWeatherForCity(city, signal);
     renderWeather(weatherData);
+
+    // ✅ Store last successful search
+    lastSearchedCity = city;
+
   } catch (error) {
     if (error.name === "AbortError") return;
 
@@ -192,8 +201,6 @@ function handleFormSubmit(event) {
   clearMessage();
 
   const rawCity = cityInput.value;
-
-  // ✅ Normalize once
   const city = normalizeCity(rawCity);
 
   const validationError = validateCity(city);
