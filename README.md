@@ -1,7 +1,8 @@
 ## Weather Now
 
-Weather Now is a lightweight and accessible weather application built using Vanilla JavaScript.  
-It retrieves real-time weather data from the OpenWeather API and demonstrates clean asynchronous control flow, UI state management, and maintainable frontend structure.
+Weather Now is a frontend-focused weather application designed to demonstrate robust API handling, controlled UI state management, and predictable asynchronous behavior using Vanilla JavaScript.
+
+It emphasizes handling real-world scenarios such as rapid user input, API failures, race conditions, and redundant request prevention while maintaining a clean and accessible user experience.
 
 **Live Demo:**  
 https://weather-now-jeswanth.netlify.app/
@@ -12,7 +13,20 @@ https://weather-now-jeswanth.netlify.app/
 - Asynchronous API handling using async/await  
 - Clear loading, success, and error states  
 - Accessible form inputs and user feedback messages  
-- Clear separation of UI logic, API logic, and application flow  
+- Clear separation of UI logic, API logic, and application flow 
+- Request cancellation using AbortController to prevent race conditions  
+- Prevention of redundant API calls for repeated searches 
+
+### Key Engineering Decisions
+
+- **Request Cancellation over Request Locking**  
+  Ongoing requests are cancelled instead of blocking user interaction, ensuring only the latest response updates the UI.
+- **Explicit UI State Management**  
+  Loading, success, and error states are handled explicitly to prevent inconsistent UI behavior.
+- **Redundant Request Prevention**  
+  Repeated searches for the same city are skipped to avoid unnecessary API calls.
+- **Separation of Concerns**  
+  API interaction, UI rendering, and application flow are structured into distinct functions.
 
 ### Accessibility Considerations
 
@@ -32,10 +46,11 @@ These improvements ensure the application remains usable across different intera
 
 ### How It Works
 
-- The user submits a city name through a semantic and accessible form  
-- The application requests weather data from the OpenWeather API  
-- UI updates are managed through explicit loading and visibility states  
-- Invalid inputs and API errors are handled gracefully without breaking the user experience
+- User input is normalized and validated before triggering any API interaction  
+- Previous requests are cancelled before initiating a new one to prevent stale updates  
+- The application transitions through explicit UI states: idle → loading → success/error  
+- API responses are validated and safely mapped to UI components  
+- UI updates occur only after successful data verification to maintain consistency  
 
 ### API Flow & State Management
 
@@ -43,7 +58,7 @@ The application follows a controlled request lifecycle to ensure predictable UI 
 
 1. Input is validated before any API request is made  
 2. Ongoing requests are safely handled using request cancellation to prevent race conditions during rapid submissions    
-3. The UI transitions into a loading state while disabling user input  
+3. Redundant requests for the same city are skipped to avoid unnecessary API calls  
 4. API responses are processed and mapped to UI updates (success or error)  
 5. The loading state is cleared and input is re-enabled after completion  
 
@@ -64,8 +79,17 @@ This ensures that each request starts from a clean state and avoids residual UI 
 ### Known Limitations
 
 - The API key is exposed on the frontend and is intended for demo purposes only  
-- No caching is implemented for repeated city searches  
+- No multi-city caching is implemented (only last-search optimization is present)    
 - The application is not production-ready without a backend proxy  
+
+### Tradeoffs
+
+- **No Backend Proxy**  
+  Prioritized simplicity and ease of deployment over API key security 
+- **No Full Caching Layer**  
+  Avoided added complexity; only redundant request prevention is implemented
+- **Manual State Management**  
+  State is handled without frameworks to keep the implementation simple but less scalable  
 
 ### Error Handling Strategy
 
