@@ -101,6 +101,23 @@ The application distinguishes between different failure scenarios to provide mea
 
 Errors are caught and surfaced through a centralized UI messaging system, ensuring that failures do not break the application flow.
 
+### Future Enhancements
+
+- **Debounced Input Handling**  
+  Introduce debouncing to limit rapid consecutive submissions and reduce unnecessary API calls during fast user interactions.
+
+- **Multi-City Response Caching**  
+  Extend the current last-search optimization to cache multiple city responses and improve performance for repeated queries.
+
+- **Backend Proxy Integration**  
+  Move API calls to a backend layer to secure API keys and enable better request control (e.g., rate limiting, logging).
+
+- **Unit Conversion (°C / °F)**  
+  Add support for temperature unit toggling with derived state updates in the UI.
+
+- **Enhanced API Error Feedback**  
+  Provide more specific handling for edge cases such as API rate limiting (e.g., HTTP 429) to improve user feedback.
+
 ### Environment Setup (Local)
 
 - Create a free OpenWeather account  
