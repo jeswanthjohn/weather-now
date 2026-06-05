@@ -28,6 +28,18 @@ https://weather-now-jeswanth.netlify.app/
 - **Separation of Concerns**  
   API interaction, UI rendering, and application flow are structured into distinct functions.
 
+### Application Architecture
+
+The application follows a simple layered structure to keep responsibilities separated and request handling predictable:
+
+- Input validation and normalization
+- Request orchestration and cancellation
+- API communication
+- Response processing and mapping
+- UI state rendering
+
+This separation helps maintain consistent behavior during rapid user interactions and simplifies future maintenance.
+
 ### Accessibility Considerations
 
 - Input focus is managed to support keyboard-first interaction  
@@ -51,6 +63,28 @@ These improvements ensure the application remains usable across different intera
 - The application transitions through explicit UI states: idle → loading → success/error  
 - API responses are validated and safely mapped to UI components  
 - UI updates occur only after successful data verification to maintain consistency  
+
+### Request Lifecycle
+
+```text
+User Input
+    ↓
+Validation
+    ↓
+Input Normalization
+    ↓
+Cancel Previous Request
+    ↓
+Skip Redundant Request (if applicable)
+    ↓
+Fetch Weather Data
+    ↓
+Process API Response
+    ↓
+Render Success / Error State
+    ↓
+Reset UI State
+```
 
 ### API Flow & State Management
 
@@ -100,6 +134,15 @@ The application distinguishes between different failure scenarios to provide mea
 - Unexpected or malformed responses  
 
 Errors are caught and surfaced through a centralized UI messaging system, ensuring that failures do not break the application flow.
+
+### Challenges & Solutions
+
+| Challenge | Solution |
+|------------|-----------|
+| Race conditions during rapid searches | Implemented request cancellation using AbortController |
+| Duplicate requests for the same city | Added redundant request prevention logic |
+| Inconsistent loader and UI states | Centralized UI state handling |
+| Different API failure scenarios | Separated network and API-level error handling |
 
 ### Future Enhancements
 
